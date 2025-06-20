@@ -3,6 +3,7 @@ import os
 import re
 import sys
 from abc import ABC, abstractmethod
+from pathlib import Path
 
 import requests
 from dotenv import load_dotenv
@@ -12,9 +13,7 @@ load_dotenv()
 
 # Debug logging setup
 DEBUG = os.getenv("DEBUG_TICKET_HOOK") == "1"
-DEBUG_LOG_PATH = os.path.join(
-    os.path.dirname(__file__), "..", ".git", "ticket_hook_debug.log"
-)
+DEBUG_LOG_PATH = Path(__file__).parent.parent / ".git" / "ticket_hook_debug.log"
 
 
 def debug_log(msg):
