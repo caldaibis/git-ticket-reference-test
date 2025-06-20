@@ -22,6 +22,9 @@ if not match:
 
 ticket = match.group(1)
 
+with open("/tmp/prepare_commit_msg.log", "a") as log:
+    log.write(f"Ticket: {ticket}\n")
+
 # Lees het huidige commit message
 with open(commit_msg_filepath, "r", encoding="utf-8") as f:
     content = f.read()
