@@ -37,4 +37,20 @@ Wil je dat commit messages alleen geaccepteerd worden als het ticket-ID daadwerk
 
 **Let op:**
 - Voor Azure DevOps moet de Personal Access Token base64-gecodeerd zijn: `echo -n ":<PAT>" | base64`
-- Als de benodigde variabelen ontbreken, wordt alleen gewaarschuwd en niet geblokkeerd. 
+- Als de benodigde variabelen ontbreken, wordt alleen gewaarschuwd en niet geblokkeerd.
+
+## Debugging & Logging
+
+Wil je precies zien wat de hooks doen? Zet dan de debug-modus aan:
+
+1. Zet in je `.env` of shell:
+   ```sh
+   DEBUG_TICKET_HOOK=1
+   ```
+2. Doe een commit. De hooks loggen nu alle relevante stappen naar:
+   ```
+   .git/ticket_hook_debug.log
+   ```
+3. Bekijk dit bestand voor uitgebreide debug-informatie over branch, commit message, matches, API-calls, etc.
+
+Zet de variabele uit (`DEBUG_TICKET_HOOK=0` of verwijder uit `.env`) om logging uit te schakelen. 
