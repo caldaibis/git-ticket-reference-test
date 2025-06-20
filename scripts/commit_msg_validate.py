@@ -10,6 +10,19 @@ from dotenv import load_dotenv
 # Laad .env automatisch
 load_dotenv()
 
+# Debug logging setup
+DEBUG = os.getenv("DEBUG_TICKET_HOOK") == "1"
+DEBUG_LOG_PATH = os.path.join(
+    os.path.dirname(__file__), "..", ".git", "ticket_hook_debug.log"
+)
+
+
+def debug_log(msg):
+    if DEBUG:
+        with open(DEBUG_LOG_PATH, "a") as log:
+            log.write(msg + "\n")
+
+
 # Ticket regex configuratie
 DEFAULT_TICKET_REGEXES = [
     r"[A-Z][A-Z0-9]+[-_][0-9]+",  # Standaard: PROJECT_123 of PROJECT-123
@@ -50,14 +63,18 @@ class TicketValidator(ABC):
 
     def warn_and_skip(self, message: str) -> bool:
         print(f"\033[93m[Waarschuwing] {message}\033[0m", file=sys.stderr)
+        debug_log(f"WARN: {message}")
         return True  # Sla validatie over als niet geconfigureerd
 
     def api_get(self, url: str, headers: dict) -> bool:
+        debug_log(f"API GET: {url} HEADERS: {headers}")
         try:
             resp = requests.get(url, headers=headers)
+            debug_log(f"API RESPONSE: {resp.status_code} {resp.text[:200]}")
             return resp.status_code == 200
         except Exception as e:
             print(f"\033[91mFOUT: API-aanroep mislukt: {e}\033[0m", file=sys.stderr)
+            debug_log(f"ERROR: API-aanroep mislukt: {e}")
             return False
 
 
@@ -130,7 +147,9 @@ def find_ticket_id(content: str):
     for regex in TICKET_REGEXES:
         match = re.search(regex, content)
         if match:
+            debug_log(f"Matched ticket: {match.group(0)} with regex: {regex}")
             return match.group(0)
+    debug_log("No ticket matched.")
     return None
 
 
@@ -138,25 +157,30 @@ def ticket_url(platform: str, ticket_id: str) -> str:
     if platform in TICKET_URLS and ticket_id:
         try:
             return TICKET_URLS[platform](ticket_id)
-        except Exception:
+        except Exception as e:
+            debug_log(f"Ticket URL generation failed: {e}")
             return None
     return None
 
 
 def main():
+    debug_log(f"ARGV: {sys.argv}")
     if len(sys.argv) < 2:
         print(
             "\033[91mFOUT: commit message bestand niet opgegeven.\033[0m",
             file=sys.stderr,
         )
+        debug_log("FOUT: commit message bestand niet opgegeven.")
         sys.exit(1)
 
     commit_msg_filepath = sys.argv[1]
     with open(commit_msg_filepath, "r", encoding="utf-8") as f:
         content = f.read()
+    debug_log(f"Commit message content: {content}")
 
     ticket_id = find_ticket_id(content)
     platform = os.getenv("TICKET_PLATFORM", "none").lower()
+    debug_log(f"Platform: {platform}, Ticket ID: {ticket_id}")
 
     if not ticket_id:
         print(
@@ -168,6 +192,7 @@ def main():
             f"\033[93mVoorbeeld commit message: {EXAMPLE_COMMIT}\033[0m",
             file=sys.stderr,
         )
+        debug_log("FOUT: Geen geldige ticketreferentie gevonden.")
         sys.exit(1)
 
     validator = get_validator(platform)
@@ -181,7 +206,9 @@ def main():
             print(
                 f"\033[93mBekijk of het ticket bestaat: {url}\033[0m", file=sys.stderr
             )
+        debug_log(f"FOUT: Ticket {ticket_id} bestaat niet op {platform}.")
         sys.exit(1)
+    debug_log("Ticket validatie geslaagd.")
     sys.exit(0)
 
 
