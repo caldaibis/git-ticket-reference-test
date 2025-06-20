@@ -13,17 +13,10 @@ branch_name = os.popen("git rev-parse --abbrev-ref HEAD").read().strip()
 TICKET_REGEX = r"([A-Z][A-Z0-9]+[-_][0-9]+)"
 match = re.search(TICKET_REGEX, branch_name)
 
-with open("./prepare_commit_msg.log", "a") as log:
-    log.write(f"Branch: {branch_name}\n")
-    log.write(f"Match: {match}\n")
-
 if not match:
     sys.exit(0)  # Geen ticket in branchnaam, doe niets
 
 ticket = match.group(1)
-
-with open("./prepare_commit_msg.log", "a") as log:
-    log.write(f"Ticket: {ticket}\n")
 
 # Lees het huidige commit message
 with open(commit_msg_filepath, "r", encoding="utf-8") as f:
