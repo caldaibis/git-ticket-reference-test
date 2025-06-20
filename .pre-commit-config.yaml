@@ -3,13 +3,13 @@ repos:
     hooks:
       - id: prepare-commit-msg-ticket
         name: Prepare commit message with ticket reference
-        entry: python3 scripts/prepare_commit_msg.py
+        entry: pdm run scripts/prepare_commit_msg.py
         language: system
         stages: [prepare-commit-msg]
         pass_filenames: true
       - id: commit-msg-ticket-validate
         name: Validate commit message for ticket reference
-        entry: python3 scripts/commit_msg_validate.py
+        entry: pdm run scripts/commit_msg_validate.py
         language: system
         stages: [commit-msg]
         pass_filenames: true 
