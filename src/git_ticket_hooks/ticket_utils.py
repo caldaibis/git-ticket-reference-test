@@ -15,7 +15,8 @@ load_dotenv()
 ENV_EXAMPLE_URL = "https://github.com/jouw-org/git-ticket-reference-automation/blob/main/.env.example"
 
 # Debug logging setup
-DEBUG_LOG_PATH = Path(__file__).parent.parent / ".git" / "ticket_hook_debug.log"
+GIT_ROOT = Path(os.getcwd())
+DEBUG_LOG_PATH = GIT_ROOT / ".git" / "ticket_hook_debug.log"
 
 # Twee soorten regexes: eerst de specifieke (met prefix), dan de algemene (nummer-gebaseerd)
 DEFAULT_TICKET_REGEXES = [
