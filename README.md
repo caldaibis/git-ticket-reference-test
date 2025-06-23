@@ -41,7 +41,7 @@ Voeg de volgende regels toe aan je `.pre-commit-config.yaml` bestand:
 
 repos:
 -   repo: https://github.com/caldaibis/git-ticket-reference-test.git
-    rev: v1.1.3  # Gebruik de laatste versie-tag!
+    rev: v1.15.0  # Gebruik de laatste versie-tag (of doe `pre-commit autoupdate` in je CLI)
     hooks:
     -   id: prepare-commit-msg-ticket
     -   id: validate-commit-msg-ticket
@@ -56,6 +56,16 @@ pre-commit install --hook-type prepare-commit-msg --hook-type commit-msg
 4. Configureer API-validatie
 
 Maak handmatig een `.env` bestand aan (zie `.env.example` in deze repo voor een voorbeeld) en voeg `.env` toe aan je `.gitignore`.
+
+## Updaten naar de nieuwste versie
+
+Om de hooks bij te werken naar de laatste versie, voer je het volgende commando uit:
+
+```bash
+pre-commit autoupdate
+```
+
+Dit commando controleert de Git-repository's in je `.pre-commit-config.yaml` en werkt de `rev` automatisch bij naar de nieuwste tag.
 
 ## Hoe het Werkt
 

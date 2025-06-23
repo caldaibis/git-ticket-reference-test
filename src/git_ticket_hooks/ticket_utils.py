@@ -53,37 +53,45 @@ def get_ticket_regexes() -> list[str]:
 def find_ticket_id(content: str) -> str | None:
     """
     Zoekt naar een ticket-ID in een string (commit message of branch-naam).
+    Probeert meerdere patronen in een specifieke volgorde voor de beste match.
     Retourneert het ID in een canoniek formaat, bijv. "[PROJ-123]" of "[#123]".
     """
-    # Patroon 1: Canoniek formaat, bijv. [PROJ-123] of [#123]
+    # Patroon 1: Prioriteit voor canonieke formaten, typisch in commit-berichten.
+    # Deze zijn expliciet en moeten voorrang krijgen.
+    # Voorbeeld: [PROJ-123]
     match = re.search(r"\[([A-Z]{2,10}-[0-9]+)\]", content, re.IGNORECASE)
     if match:
         ticket = match.group(1).upper().replace("_", "-")
         canoniek_formaat = f"[{ticket}]"
-        debug_log(f"Gevonden canoniek ticket: {canoniek_formaat}")
+        debug_log(f"Gevonden canoniek ticket (traditioneel): {canoniek_formaat}")
         return canoniek_formaat
 
+    # Voorbeeld: [#123]
     match = re.search(r"\[#([0-9]+)\]", content)
     if match:
         ticket_num = match.group(1)
         canoniek_formaat = f"[#{ticket_num}]"
-        debug_log(f"Gevonden platform ticket: {canoniek_formaat}")
+        debug_log(f"Gevonden canoniek ticket (platform): {canoniek_formaat}")
         return canoniek_formaat
 
-    # Patroon 2: Ruw formaat in branch-namen, bijv. PROJ-123- of 123-
-    for pattern in get_ticket_regexes():
-        match = re.search(pattern, content, re.IGNORECASE)
-        if match:
-            # Extract the most relevant part of the match
-            ticket_part = next((g for g in match.groups() if g and (g.upper().startswith(tuple('ABCDEFGHIJKLMNOPQRSTUVWXYZ')) or g.isdigit())), None)
-            if ticket_part:
-                # Formatteer naar een canoniek formaat
-                if '-' in ticket_part or '_' in ticket_part:
-                    canoniek_formaat = f"[{ticket_part.upper().replace('_', '-')}]"
-                else:
-                    canoniek_formaat = f"[#{ticket_part}]"
-                debug_log(f"Gevonden ruw ticket: {ticket_part}, geformatteerd naar {canoniek_formaat}")
-                return canoniek_formaat
+    # Patroon 2: Zoek naar ruwe formaten, typisch in branch-namen.
+    # Deze zijn minder expliciet en dienen als fallback.
+
+    # Zoek eerst naar het traditionele formaat (bv. PROJ-123), dit is specifieker.
+    match = re.search(r"([A-Z]{2,10}-[0-9]+)", content, re.IGNORECASE)
+    if match:
+        ticket = match.group(1).upper().replace("_", "-")
+        canoniek_formaat = f"[{ticket}]"
+        debug_log(f"Gevonden ruw ticket (traditioneel): {ticket}, geformatteerd naar {canoniek_formaat}")
+        return canoniek_formaat
+
+    # Zoek als laatste naar platform-specifieke nummers (bv. /123-).
+    match = re.search(r"(?:^|/|#)([0-9]+)(?:[-_])", content)
+    if match:
+        ticket_num = match.group(1)
+        canoniek_formaat = f"[#{ticket_num}]"
+        debug_log(f"Gevonden ruw ticket (platform): {ticket_num}, geformatteerd naar {canoniek_formaat}")
+        return canoniek_formaat
 
     debug_log(f"Geen ticket ID gevonden in: '{content[:70]}...'")
     return None
