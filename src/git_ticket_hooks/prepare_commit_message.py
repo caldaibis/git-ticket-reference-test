@@ -3,7 +3,7 @@ import os
 import sys
 from pathlib import Path
 
-from ticket_utils import debug_log, find_ticket_id
+from .ticket_utils import debug_log, find_ticket_id
 
 
 def get_branch_name() -> str:

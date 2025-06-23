@@ -2,7 +2,7 @@
 import os
 import sys
 
-from ticket_utils import (
+from .ticket_utils import (
     debug_log,
     find_ticket_id,
     get_validator,

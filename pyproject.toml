@@ -14,8 +14,8 @@ readme = "README.md"
 license = {text = "MIT"}
 
 [project.scripts]
-prepare-commit-msg-ticket = "scripts.prepare_commit_message:main"
-validate-commit-msg-ticket = "scripts.validate_commit_message:main"
+prepare-commit-msg-ticket = "git_ticket_hooks.prepare_commit_message:main"
+validate-commit-msg-ticket = "git_ticket_hooks.validate_commit_message:main"
 
 [tool.pdm]
 distribution = false
