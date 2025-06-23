@@ -49,14 +49,17 @@ def main():
     platform = os.getenv("TICKET_PLATFORM", "").lower()
     if not platform:
         print(
-            "\033[93m[INFO] API-validatie van ticket overgeslagen. 'TICKET_PLATFORM' niet ingesteld.\033[0m",
+            "\033[93m[Waarschuwing] Ticket-validatie is overgeslagen omdat 'TICKET_PLATFORM' niet is ingesteld.\033[0m",
             file=sys.stderr,
         )
         print(
-            "Om dit in te schakelen, maak een .env bestand en configureer de variabelen.",
+            "\033[93mHoewel niet verplicht, wordt dit aanbevolen om de juistheid van ticketreferenties te garanderen.\033[0m",
             file=sys.stderr,
         )
-        print(f"Zie voorbeeld: {ENV_EXAMPLE_URL}", file=sys.stderr)
+        print(
+            f"\033[93mRaadpleeg de documentatie of het .env.example voor configuratie: {ENV_EXAMPLE_URL}\033[0m",
+            file=sys.stderr,
+        )
         debug_log("Validation SKIPPED: TICKET_PLATFORM not set.")
         sys.exit(0)  # Stop succesvol, want validatie is niet verplicht
 
