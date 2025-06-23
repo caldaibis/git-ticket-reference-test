@@ -45,24 +45,43 @@ def get_ticket_regexes() -> list[str]:
 
 def find_ticket_id(content: str) -> str | None:
     """
-    Zoekt naar een ticket ID in een string. Probeert eerst een prefix-formaat (PROJ-123)
-    en daarna een nummer-formaat (#123 of 123-).
-    Retourneert het ID in een canoniek formaat: [PROJ-123] of [#123].
+    Zoekt naar een ticket ID in een string. Probeert meerdere patronen in volgorde.
+    1. Canoniek formaat in commit message: [#123] of [PROJ-123]
+    2. Ruw formaat in branch-naam: 123- of PROJ-123
+    Retourneert het ID in een canoniek formaat: "[#123]" of "[PROJ-123]".
     """
-    # Patroon 1: Traditioneel formaat (bv. PROJ-123)
+    # Patroon 1a: Zoek naar het definitieve platform-formaat: [#123]
+    match = re.search(r"\[#([0-9]+)\]", content)
+    if match:
+        ticket_num = match.group(1)
+        canoniek_formaat = f"[#{ticket_num}]"
+        debug_log(f"Matched canoniek platform ticket: {canoniek_formaat}")
+        return canoniek_formaat
+
+    # Patroon 1b: Zoek naar het definitieve traditionele formaat: [PROJ-123]
+    match = re.search(r"\[([A-Z]{2,10}-[0-9]+)\]", content, re.IGNORECASE)
+    if match:
+        ticket = match.group(1).upper().replace("_", "-")
+        canoniek_formaat = f"[{ticket}]"
+        debug_log(f"Matched canoniek traditioneel ticket: {canoniek_formaat}")
+        return canoniek_formaat
+
+    # --- Als bovenstaande niet matchen, zoek naar ruwe formaten in branch-namen ---
+
+    # Patroon 2a: Platform-native nummer in branch (123-, /123-, #123-)
+    match = re.search(r"(?:^|/|#)([0-9]+)(?:[-_])", content)
+    if match:
+        ticket_num = match.group(1)
+        canoniek_formaat = f"[#{ticket_num}]"
+        debug_log(f"Matched ruw platform ticket: {ticket_num}, geformatteerd naar {canoniek_formaat}")
+        return canoniek_formaat
+
+    # Patroon 2b: Traditioneel formaat in branch (PROJ-123)
     match = re.search(r"([A-Z]{2,10}-[0-9]+)", content, re.IGNORECASE)
     if match:
         ticket = match.group(1).upper().replace("_", "-")
-        debug_log(f"Matched traditioneel ticket: {ticket}")
-        return f"[{ticket}]"
-
-    # Patroon 2: Platform-native nummer (bv. 123-..., /123-, #123-)
-    match = re.search(r"(?:^|/|#)([0-9]+)(?:[-_])", content)
-    if match:
-        # We gebruiken group(1) omdat dat de capture group is voor alleen het nummer
-        ticket_num = match.group(1)
-        canoniek_formaat = f"[#{ticket_num}]"
-        debug_log(f"Matched platform ticket nummer: {ticket_num}, geformatteerd als {canoniek_formaat}")
+        canoniek_formaat = f"[{ticket}]"
+        debug_log(f"Matched ruw traditioneel ticket: {ticket}, geformatteerd naar {canoniek_formaat}")
         return canoniek_formaat
 
     debug_log(f"Geen ticket ID gevonden in content: '{content[:70]}...'")
