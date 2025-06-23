@@ -15,7 +15,6 @@ load_dotenv()
 ENV_EXAMPLE_URL = "https://github.com/jouw-org/git-ticket-reference-automation/blob/main/.env.example"
 
 # Debug logging setup
-DEBUG = os.getenv("DEBUG_TICKET_HOOK") == "1"
 DEBUG_LOG_PATH = Path(__file__).parent.parent / ".git" / "ticket_hook_debug.log"
 
 # Twee soorten regexes: eerst de specifieke (met prefix), dan de algemene (nummer-gebaseerd)
@@ -30,10 +29,9 @@ EXAMPLE_COMMIT = "[#123]: beschrijving  (OF [PROJ-123]: ...)"
 
 # --- HULPFUNCTIES ---
 def debug_log(msg: str):
-    """Schrijft een debug-bericht naar de logfile als debuggen aanstaat."""
-    if DEBUG:
-        with open(DEBUG_LOG_PATH, "a") as log:
-            log.write(msg + "\n")
+    """Schrijft een debug-bericht naar de logfile."""
+    with open(DEBUG_LOG_PATH, "a") as log:
+        log.write(msg + "\n")
 
 
 def get_ticket_regexes() -> list[str]:

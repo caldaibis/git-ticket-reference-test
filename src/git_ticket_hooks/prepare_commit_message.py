@@ -3,7 +3,7 @@ import os
 import sys
 from pathlib import Path
 
-from .ticket_utils import debug_log, find_ticket_id
+from .ticket_utils import debug_log, find_ticket_id, DEBUG_LOG_PATH
 
 
 def get_branch_name() -> str:
@@ -26,6 +26,7 @@ def main():
     ticket_id = find_ticket_id(branch_name)
     if not ticket_id:
         debug_log("No ticket found in branch name. Exiting.")
+        print(f"\033[93mGeen ticket ID gevonden in branchnaam. Zie het debug logbestand voor details: {DEBUG_LOG_PATH}\033[0m", file=sys.stderr)
         sys.exit(0)
 
     with open(commit_msg_filepath, "r+", encoding="utf-8") as f:
