@@ -8,11 +8,15 @@ Deze repository automatiseert het toevoegen en valideren van ticketreferenties i
 
 ## Installatie
 1. Installeer [pre-commit](https://pre-commit.com/):
-   ```sh
-   pip install pre-commit
+   ```bash
+   # Met pipx
+   pipx install pre-commit
+
+   # Met uv
+   uv tool install pre-commit
    ```
 2. Installeer de hooks:
-   ```sh
+   ```bash
    pre-commit install --hook-type prepare-commit-msg --hook-type commit-msg
    ```
 
@@ -32,7 +36,7 @@ Wil je dat commit messages alleen geaccepteerd worden als het ticket-ID daadwerk
    cp .env.example .env
    ```
 2. Vul de juiste waarden in voor jouw platform en project.
-3. **Handmatig exporteren is niet nodig!** De benodigde variabelen worden automatisch geladen uit `.env` door de hook scripts (via python-dotenv).
+3. De benodigde variabelen worden automatisch geladen uit `.env` door de hook scripts (via python-dotenv).
 4. Zet de variabele `TICKET_PLATFORM` op `gitlab`, `github` of `azure`.
 
 **Let op:**
