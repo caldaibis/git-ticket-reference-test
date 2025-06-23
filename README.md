@@ -6,42 +6,62 @@ Deze repository automatiseert het toevoegen en valideren van ticketreferenties i
 - **prepare-commit-msg**: Voegt automatisch een ticketreferentie toe aan het commitbericht, op basis van de branchnaam (bijv. `feature/ABC-123-beschrijving`).
 - **commit-msg**: Valideert of het commitbericht een geldige ticketreferentie bevat.
 
-## Installatie
-1. Installeer [pre-commit](https://pre-commit.com/):
-   ```bash
+## Integratie in jouw project
+
+Om deze automatische ticket-referenties in jouw repository te gebruiken, volg je deze stappen. Dit hoef je maar één keer per repository te doen.
+
+1. Installeer [pre-commit](https://pre-commit.com/)
+
+Indien je dit nog niet hebt:
+
+```bash
    # Met pipx
    pipx install pre-commit
 
    # Met uv
    uv tool install pre-commit
    ```
-2. Installeer de hooks:
-   ```bash
-   pre-commit install --hook-type prepare-commit-msg --hook-type commit-msg
-   ```
 
-## Configuratie
-- De configuratie staat in `.pre-commit-config.yaml`.
-- De scripts staan in de map `scripts/`.
+2. Configureer .pre-commit-config.yaml
 
-## Optionele uitbreiding
-- API-validatie van tickets is mogelijk door de scripts uit te breiden en tokens via omgevingsvariabelen aan te bieden. 
+Maak een .pre-commit-config.yaml-bestand aan in de root van je project (of voeg dit toe aan je bestaande bestand). Voeg de volgende configuratie toe:
 
-## API-validatie van tickets
 
-Wil je dat commit messages alleen geaccepteerd worden als het ticket-ID daadwerkelijk bestaat op GitLab, GitHub of Azure DevOps? Zet dan de juiste variabelen in een `.env`-bestand. Zie `.env.example` voor een voorbeeld.
+```yaml
+# .pre-commit-config.yaml
+repos:
+-   repo: https://github.com/caldaibis/git-ticket-reference-test.git
+    rev: v1.0.0  # Gebruik de laatste versie-tag
+    hooks:
+    -   id: prepare-commit-msg-ticket
+    -   id: validate-commit-msg-ticket
+```
 
-1. Kopieer het voorbeeldbestand:
-   ```sh
-   cp .env.example .env
-   ```
-2. Vul de juiste waarden in voor jouw platform en project.
-3. De benodigde variabelen worden automatisch geladen uit `.env` door de hook scripts (via python-dotenv).
-4. Zet de variabele `TICKET_PLATFORM` op `gitlab`, `github` of `azure`.
+3. Activeer de Hooks
+
+Voer het volgende commando uit in je project-repository. Dit koppelt de hooks aan je lokale Git-configuratie.
+
+```bash
+pre-commit install --hook-type prepare-commit-msg --hook-type commit-msg
+```
+
+4. (Optioneel) Configureer API-validatie
+
+Voor validatie tegen GitLab, GitHub of Azure DevOps:
+
+   1. Download het `.env.example`-bestand van de automation repository.
+   2. Hernoem het naar `.env` en plaats het in de root van jouw project.
+   3. Vul de vereiste variabelen in (zie `.env.example` voor details).
+
+Dat is alles! De hooks worden nu automatisch uitgevoerd bij elke `git commit`.
 
 **Let op:**
 - Voor Azure DevOps moet de Personal Access Token base64-gecodeerd zijn: `echo -n ":<PAT>" | base64`
 - Als de benodigde variabelen ontbreken, wordt alleen gewaarschuwd en niet geblokkeerd.
+
+### Makkelijk updaten
+
+Als je de nieuwste versie van deze hooks wil hebben, kun je in jouw project simpelweg `pre-commit autoupdate` draaien. pre-commit ziet de nieuwe tag en werkt de rev in hun configuratie automatisch bij.
 
 ## Debugging & Logging
 
