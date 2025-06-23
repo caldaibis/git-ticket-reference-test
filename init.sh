@@ -81,5 +81,11 @@ fi
 echo "Installeren van de Git hooks..."
 pre-commit install --hook-type prepare-commit-msg --hook-type commit-msg
 
-echo -e "\n${GREEN}✔ Setup voltooid!${NC}"
-echo "De hooks zijn nu actief in deze repository."
+# --- SUCCESMELDING ---
+echo -e "\n${GREEN}✔ Setup voltooid! De hooks zijn nu actief.${NC}"
+echo "-------------------------------------------------------------------"
+echo -e "${YELLOW}** ACTIE VEREIST: Configureer API-validatie **${NC}"
+echo "Om te controleren of tickets echt bestaan, moet je het aangemaakte"
+echo -e "'.env' bestand invullen met de juiste waarden voor jouw platform."
+echo "Zonder deze configuratie wordt het bestaan van tickets NIET gevalideerd."
+echo "-------------------------------------------------------------------"

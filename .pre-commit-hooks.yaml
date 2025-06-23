@@ -7,6 +7,7 @@
     language: python
     stages: [prepare-commit-msg]
     additional_dependencies: [python-dotenv]
+    verbose: true
 
 -   id: validate-commit-msg-ticket
     name: 'Validate commit message for ticket ID'
@@ -15,3 +16,4 @@
     language: python
     stages: [commit-msg]
     additional_dependencies: [python-dotenv, requests]
+    verbose: true
