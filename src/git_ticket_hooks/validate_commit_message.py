@@ -34,7 +34,7 @@ def main():
 
     commit_msg_filepath = sys.argv[1]
     with open(commit_msg_filepath, "r", encoding="utf-8") as f:
-        content = f.read()
+        content = f.read().strip()
     debug_log(f"Commit message content: '{content}'")
 
     ticket_id = find_ticket_id(content)

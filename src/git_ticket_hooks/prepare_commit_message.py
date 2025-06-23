@@ -30,7 +30,7 @@ def main():
         sys.exit(0)
 
     with open(commit_msg_filepath, "r+", encoding="utf-8") as f:
-        content = f.read()
+        content = f.read().strip()
         debug_log(f"Commit message before: '{content}'")
 
         # Voeg ticket toe als het bericht leeg is of nog geen ticket bevat
