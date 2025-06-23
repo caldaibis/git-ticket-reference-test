@@ -5,7 +5,7 @@
 #  Dit script configureert de pre-commit hooks in een doelrepository.
 # ==============================================================================
 
-# --- Configuratie (pas deze URL's aan naar jouw repo) ---
+# --- Configuratie ---
 REPO_URL="https://github.com/caldaibis/git-ticket-reference-test.git"
 ENV_EXAMPLE_RAW_URL="https://raw.githubusercontent.com/caldaibis/git-ticket-reference-test/main/.env.example"
 # --- Einde Configuratie ---

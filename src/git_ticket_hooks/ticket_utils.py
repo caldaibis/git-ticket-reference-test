@@ -12,7 +12,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # --- CONFIGURATIE ---
-ENV_EXAMPLE_URL = "https://github.com/jouw-org/git-ticket-reference-automation/blob/main/.env.example"
+ENV_EXAMPLE_URL = "https://github.com/caldaibis/git-ticket-reference-test/blob/main/.env.example"
 
 # Debug logging setup
 GIT_ROOT = Path(os.getcwd())
