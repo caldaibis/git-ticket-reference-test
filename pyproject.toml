@@ -13,6 +13,9 @@ requires-python = ">=3.8"
 readme = "README.md"
 license = {text = "MIT"}
 
+[project.scripts]
+prepare-commit-msg-ticket = "scripts.prepare_commit_message:main"
+validate-commit-msg-ticket = "scripts.validate_commit_message:main"
 
 [tool.pdm]
 distribution = false
