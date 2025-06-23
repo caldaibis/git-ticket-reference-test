@@ -12,19 +12,20 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # --- CONFIGURATIE ---
-# NIEUW: Centrale URL voor het .env.example bestand in je repo
 ENV_EXAMPLE_URL = "https://github.com/jouw-org/git-ticket-reference-automation/blob/main/.env.example"
 
 # Debug logging setup
 DEBUG = os.getenv("DEBUG_TICKET_HOOK") == "1"
 DEBUG_LOG_PATH = Path(__file__).parent.parent / ".git" / "ticket_hook_debug.log"
 
-# Ticket regex configuratie
+# Twee soorten regexes: eerst de specifieke (met prefix), dan de algemene (nummer-gebaseerd)
 DEFAULT_TICKET_REGEXES = [
-    r"[A-Z][A-Z0-9]+[-_][0-9]+",  # Standaard: PROJECT_123 of PROJECT-123
+    r"([A-Z]{2,10}-[0-9]+)",          # 1. Traditioneel formaat: PROJ-123
+    r"(^|/|#)([0-9]+)([-_])",         # 2. Platform-formaat: 123-..., feature/123-, #123-
 ]
-EXAMPLE_BRANCH = "feature/PROJ-123-omschrijving"
-EXAMPLE_COMMIT = "PROJ-123: beschrijving van de wijziging"
+
+EXAMPLE_BRANCH = "feature/123-nieuwe-functionaliteit  (OF feature/PROJ-123-...)"
+EXAMPLE_COMMIT = "[#123]: beschrijving  (OF [PROJ-123]: ...)"
 
 
 # --- HULPFUNCTIES ---
@@ -44,20 +45,36 @@ def get_ticket_regexes() -> list[str]:
 
 
 def find_ticket_id(content: str) -> str | None:
-    """Zoekt naar de eerste ticket ID in een string op basis van de geldende regexes."""
-    for regex in get_ticket_regexes():
-        match = re.search(regex, content, re.IGNORECASE)
-        if match:
-            ticket = match.group(0).upper().replace("_", "-")
-            debug_log(f"Matched ticket: {ticket} with regex: {regex}")
-            return ticket
-    debug_log(f"No ticket matched in content: '{content[:50]}...'")
+    """
+    Zoekt naar een ticket ID in een string. Probeert eerst een prefix-formaat (PROJ-123)
+    en daarna een nummer-formaat (#123 of 123-).
+    Retourneert het ID in een canoniek formaat: [PROJ-123] of [#123].
+    """
+    # Patroon 1: Traditioneel formaat (bv. PROJ-123)
+    match = re.search(r"([A-Z]{2,10}-[0-9]+)", content, re.IGNORECASE)
+    if match:
+        ticket = match.group(1).upper().replace("_", "-")
+        debug_log(f"Matched traditioneel ticket: {ticket}")
+        return f"[{ticket}]"
+
+    # Patroon 2: Platform-native nummer (bv. 123-..., /123-, #123-)
+    match = re.search(r"(?:^|/|#)([0-9]+)(?:[-_])", content)
+    if match:
+        # We gebruiken group(1) omdat dat de capture group is voor alleen het nummer
+        ticket_num = match.group(1)
+        canoniek_formaat = f"[#{ticket_num}]"
+        debug_log(f"Matched platform ticket nummer: {ticket_num}, geformatteerd als {canoniek_formaat}")
+        return canoniek_formaat
+
+    debug_log(f"Geen ticket ID gevonden in content: '{content[:70]}...'")
     return None
 
 
 def extract_issue_num(ticket_id: str) -> str:
-    """Extraheert het nummer uit een ticket ID."""
-    return ticket_id.split("-")[-1] if "-" in ticket_id else ticket_id.split("_")[-1]
+    """Extraheert het nummer uit een ticket ID, ongeacht het formaat."""
+    # Verwijder haken en hekje voor de extractie
+    clean_id = ticket_id.strip("[]#")
+    return clean_id.split("-")[-1] if "-" in clean_id else clean_id.split("_")[-1]
 
 
 # --- VALIDATIEKLASSEN ---
