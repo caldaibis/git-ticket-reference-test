@@ -8,14 +8,18 @@ from pathlib import Path
 import requests
 from dotenv import load_dotenv
 
-# Laad .env automatisch
-load_dotenv()
-
 # --- CONFIGURATIE ---
+
+# Bepaal de root van de Git-repository
+GIT_ROOT = Path(os.getcwd())
+
+# Laad .env automatisch
+# Laad het .env bestand vanuit de root van de gebruikersrepository
+load_dotenv(dotenv_path=GIT_ROOT / '.env')
+
 ENV_EXAMPLE_URL = "https://github.com/caldaibis/git-ticket-reference-test/blob/main/.env.example"
 
 # Debug logging setup
-GIT_ROOT = Path(os.getcwd())
 DEBUG_LOG_PATH = GIT_ROOT / ".git" / "ticket_hook_debug.log"
 
 # Twee soorten regexes: eerst de specifieke (met prefix), dan de algemene (nummer-gebaseerd)

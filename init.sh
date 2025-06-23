@@ -65,7 +65,6 @@ ENV_FILE=".env"
 if [ ! -f "$ENV_FILE" ]; then
     echo "Downloaden van configuratievoorbeeld naar ${ENV_FILE}..."
     curl -s -o "$ENV_FILE" "$ENV_EXAMPLE_RAW_URL"
-    echo -e "${YELLOW}BELANGRIJK: Pas het aangemaakte '${ENV_FILE}' bestand aan met jouw tokens en instellingen!${NC}"
 else
     echo "Bestand '${ENV_FILE}' bestaat al. Overslaan."
 fi
