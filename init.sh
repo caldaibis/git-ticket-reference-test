@@ -5,8 +5,9 @@
 #  Dit script configureert de pre-commit hooks in een doelrepository.
 # ==============================================================================
 
-# --- Configuratie (pas deze URL aan naar jouw repo) ---
+# --- Configuratie (pas deze URL's aan naar jouw repo) ---
 REPO_URL="https://github.com/caldaibis/git-ticket-reference-test.git"
+ENV_EXAMPLE_RAW_URL="https://raw.githubusercontent.com/caldaibis/git-ticket-reference-test/main/.env.example"
 # --- Einde Configuratie ---
 
 # Kleurcodes voor output
@@ -19,8 +20,7 @@ echo -e "${GREEN}--- Setup voor Automatische Ticket Referenties ---${NC}"
 # 1. Controleer of pre-commit geïnstalleerd is
 if ! command -v pre-commit &> /dev/null; then
     echo -e "${YELLOW}FOUT: 'pre-commit' is niet geïnstalleerd.${NC}"
-    echo "Installeer het eerst via: pip install pre-commit of pipx install pre-commit of uv tool install pre-commit"
-    echo "Zie ook: https://pre-commit.com/#install"
+    echo "Installeer het eerst via: pip install pre-commit"
     exit 1
 fi
 
@@ -30,16 +30,14 @@ LATEST_TAG=$(git ls-remote --tags --sort="v:refname" "$REPO_URL" | tail -n1 | se
 
 if [ -z "$LATEST_TAG" ]; then
     echo -e "${YELLOW}FOUT: Kon geen versie-tag vinden in de remote repository.${NC}"
-    echo "Zorg ervoor dat de repo '${REPO_URL}' minstens één versie-tag heeft (bv. v1.0.0)."
     exit 1
 fi
 echo "Gevonden versie: ${GREEN}$LATEST_TAG${NC}"
 
-# 3. Configureer .pre-commit-config.yaml (maakt aan of voegt toe)
+# 3. Configureer .pre-commit-config.yaml
 CONFIG_FILE=".pre-commit-config.yaml"
-HOOK_CONFIG=$(cat <<EOF
-# Configuratie voor automatische ticket referenties
-  - repo: $REPO_URL
+HOOK_BLOCK=$(cat <<EOF
+-   repo: $REPO_URL
     rev: $LATEST_TAG
     hooks:
     -   id: prepare-commit-msg-ticket
@@ -47,19 +45,26 @@ HOOK_CONFIG=$(cat <<EOF
 EOF
 )
 
-if ! grep -q "$REPO_URL" "$CONFIG_FILE" 2>/dev/null; then
-    echo "Toevoegen van hook-configuratie aan ${CONFIG_FILE}..."
-    echo -e "\n$HOOK_CONFIG" >> "$CONFIG_FILE"
+if [ ! -f "$CONFIG_FILE" ]; then
+    echo "Bestand ${CONFIG_FILE} niet gevonden. Aanmaken..."
+    echo "# pre-commit configuratie" > "$CONFIG_FILE"
+    echo "repos:" >> "$CONFIG_FILE"
+    echo "$HOOK_BLOCK" >> "$CONFIG_FILE"
 else
-    echo "Hook-configuratie bestaat al in ${CONFIG_FILE}. Overslaan."
+    if ! grep -q "$REPO_URL" "$CONFIG_FILE"; then
+        echo "Toevoegen van hook-configuratie aan bestaande ${CONFIG_FILE}..."
+        echo "" >> "$CONFIG_FILE"
+        echo "$HOOK_BLOCK" >> "$CONFIG_FILE"
+    else
+        echo "Hook-configuratie voor ${REPO_URL} bestaat al. Overslaan."
+    fi
 fi
 
 # 4. Maak .env bestand aan van voorbeeld, indien het nog niet bestaat
 ENV_FILE=".env"
 if [ ! -f "$ENV_FILE" ]; then
     echo "Downloaden van configuratievoorbeeld naar ${ENV_FILE}..."
-    ENV_EXAMPLE_URL="https://raw.githubusercontent.com/$(echo $REPO_URL | sed 's/https:\/\///' | sed 's/.git//')/main/.env.example"
-    curl -s -o "$ENV_FILE" "$ENV_EXAMPLE_URL"
+    curl -s -o "$ENV_FILE" "$ENV_EXAMPLE_RAW_URL"
     echo -e "${YELLOW}BELANGRIJK: Pas het aangemaakte '${ENV_FILE}' bestand aan met jouw tokens en instellingen!${NC}"
 else
     echo "Bestand '${ENV_FILE}' bestaat al. Overslaan."

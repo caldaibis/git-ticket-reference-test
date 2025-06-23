@@ -14,6 +14,8 @@ Voor de allersnelste installatie in een nieuw of bestaand project, voer je het v
 curl -sSL https://raw.githubusercontent.com/caldaibis/git-ticket-reference-test/main/init.sh | bash
 ```
 
+https://raw.githubusercontent.com/caldaibis/git-ticket-reference-test/refs/heads/main/init.sh?token=GHSAT0AAAAAADGD4ULYQKZEWAGOBKBLO5EW2CZHEIQ
+
 (Vervang de URL met de raw link naar jouw `init.sh` bestand)
 
 Dit script doet het volgende voor je:
