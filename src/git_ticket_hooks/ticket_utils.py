@@ -1,4 +1,3 @@
-# scripts/ticket_utils.py
 import os
 import re
 import sys
@@ -10,37 +9,41 @@ from dotenv import load_dotenv
 
 # --- CONFIGURATIE ---
 
-# Bepaal de root van de Git-repository
+# Bepaal de root van de Git-repository.
 GIT_ROOT = Path(os.getcwd())
 
-# Laad .env automatisch
-# Laad het .env bestand vanuit de root van de gebruikersrepository
+# Laad omgevingsvariabelen uit het .env-bestand in de root van de repository.
 load_dotenv(dotenv_path=GIT_ROOT / '.env')
 
+# URL naar het .env.example bestand voor documentatie.
 ENV_EXAMPLE_URL = "https://github.com/caldaibis/git-ticket-reference-test/blob/main/.env.example"
 
-# Debug logging setup
+# Pad naar het debug-logbestand.
 DEBUG_LOG_PATH = GIT_ROOT / ".git" / "ticket_hook_debug.log"
 
-# Twee soorten regexes: eerst de specifieke (met prefix), dan de algemene (nummer-gebaseerd)
+# Standaard reguliere expressies voor het herkennen van ticket ID's.
+# 1. Traditioneel formaat: PROJ-123
+# 2. Platform-specifiek formaat: #123, feature/123-, 123_
 DEFAULT_TICKET_REGEXES = [
-    r"([A-Z]{2,10}-[0-9]+)",          # 1. Traditioneel formaat: PROJ-123
-    r"(^|/|#)([0-9]+)([-_])",         # 2. Platform-formaat: 123-..., feature/123-, #123-
+    r"([A-Z]{2,10}-[0-9]+)",
+    r"(^|/|#)([0-9]+)([-_])",
 ]
 
-EXAMPLE_BRANCH = "feature/123-nieuwe-functionaliteit  (OF feature/PROJ-123-...)"
-EXAMPLE_COMMIT = "[#123]: beschrijving  (OF [PROJ-123]: ...)"
+# Voorbeelden voor gebruikers.
+EXAMPLE_BRANCH = "feature/PROJ-123-nieuwe-functionaliteit of feature/123-iets-anders"
+EXAMPLE_COMMIT = "[PROJ-123]: beschrijving of [#123]: beschrijving"
 
 
 # --- HULPFUNCTIES ---
+
 def debug_log(msg: str):
-    """Schrijft een debug-bericht naar de logfile."""
-    with open(DEBUG_LOG_PATH, "a") as log:
+    """Schrijft een debug-bericht naar het logbestand."""
+    with open(DEBUG_LOG_PATH, "a", encoding="utf-8") as log:
         log.write(msg + "\n")
 
 
 def get_ticket_regexes() -> list[str]:
-    """Haalt de te gebruiken ticket regexes op, met voorkeur voor de .env instelling."""
+    """Haalt de ticket regexes op uit de .env-instelling, of gebruikt de standaardwaarden."""
     env_regex = os.getenv("TICKET_REGEX")
     if env_regex:
         return [r.strip() for r in env_regex.split(",") if r.strip()]
@@ -49,54 +52,48 @@ def get_ticket_regexes() -> list[str]:
 
 def find_ticket_id(content: str) -> str | None:
     """
-    Zoekt naar een ticket ID in een string. Probeert meerdere patronen in volgorde.
-    1. Canoniek formaat in commit message: [#123] of [PROJ-123]
-    2. Ruw formaat in branch-naam: 123- of PROJ-123
-    Retourneert het ID in een canoniek formaat: "[#123]" of "[PROJ-123]".
+    Zoekt naar een ticket-ID in een string (commit message of branch-naam).
+    Retourneert het ID in een canoniek formaat, bijv. "[PROJ-123]" of "[#123]".
     """
-    # Patroon 1a: Zoek naar het definitieve platform-formaat: [#123]
-    match = re.search(r"\[#([0-9]+)\]", content)
-    if match:
-        ticket_num = match.group(1)
-        canoniek_formaat = f"[#{ticket_num}]"
-        debug_log(f"Matched canoniek platform ticket: {canoniek_formaat}")
-        return canoniek_formaat
-
-    # Patroon 1b: Zoek naar het definitieve traditionele formaat: [PROJ-123]
+    # Patroon 1: Canoniek formaat, bijv. [PROJ-123] of [#123]
     match = re.search(r"\[([A-Z]{2,10}-[0-9]+)\]", content, re.IGNORECASE)
     if match:
         ticket = match.group(1).upper().replace("_", "-")
         canoniek_formaat = f"[{ticket}]"
-        debug_log(f"Matched canoniek traditioneel ticket: {canoniek_formaat}")
+        debug_log(f"Gevonden canoniek ticket: {canoniek_formaat}")
         return canoniek_formaat
 
-    # --- Als bovenstaande niet matchen, zoek naar ruwe formaten in branch-namen ---
-
-    # Patroon 2a: Platform-native nummer in branch (123-, /123-, #123-)
-    match = re.search(r"(?:^|/|#)([0-9]+)(?:[-_])", content)
+    match = re.search(r"\[#([0-9]+)\]", content)
     if match:
         ticket_num = match.group(1)
         canoniek_formaat = f"[#{ticket_num}]"
-        debug_log(f"Matched ruw platform ticket: {ticket_num}, geformatteerd naar {canoniek_formaat}")
+        debug_log(f"Gevonden platform ticket: {canoniek_formaat}")
         return canoniek_formaat
 
-    # Patroon 2b: Traditioneel formaat in branch (PROJ-123)
-    match = re.search(r"([A-Z]{2,10}-[0-9]+)", content, re.IGNORECASE)
-    if match:
-        ticket = match.group(1).upper().replace("_", "-")
-        canoniek_formaat = f"[{ticket}]"
-        debug_log(f"Matched ruw traditioneel ticket: {ticket}, geformatteerd naar {canoniek_formaat}")
-        return canoniek_formaat
+    # Patroon 2: Ruw formaat in branch-namen, bijv. PROJ-123- of 123-
+    for pattern in get_ticket_regexes():
+        match = re.search(pattern, content, re.IGNORECASE)
+        if match:
+            # Extract the most relevant part of the match
+            ticket_part = next((g for g in match.groups() if g and (g.upper().startswith(tuple('ABCDEFGHIJKLMNOPQRSTUVWXYZ')) or g.isdigit())), None)
+            if ticket_part:
+                # Formatteer naar een canoniek formaat
+                if '-' in ticket_part or '_' in ticket_part:
+                    canoniek_formaat = f"[{ticket_part.upper().replace('_', '-')}]"
+                else:
+                    canoniek_formaat = f"[#{ticket_part}]"
+                debug_log(f"Gevonden ruw ticket: {ticket_part}, geformatteerd naar {canoniek_formaat}")
+                return canoniek_formaat
 
-    debug_log(f"Geen ticket ID gevonden in content: '{content[:70]}...'")
+    debug_log(f"Geen ticket ID gevonden in: '{content[:70]}...'")
     return None
 
 
 def extract_issue_num(ticket_id: str) -> str:
-    """Extraheert het nummer uit een ticket ID, ongeacht het formaat."""
-    # Verwijder haken en hekje voor de extractie
+    """Extraheert het numerieke gedeelte uit een ticket-ID."""
     clean_id = ticket_id.strip("[]#")
-    return clean_id.split("-")[-1] if "-" in clean_id else clean_id.split("_")[-1]
+    # Werkt voor "PROJ-123" en "123"
+    return clean_id.split("-")[-1] if "-" in clean_id else clean_id
 
 
 # --- VALIDATIEKLASSEN ---

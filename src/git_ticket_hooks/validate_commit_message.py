@@ -16,10 +16,10 @@ from .ticket_utils import (
 def print_error(message: str, show_examples: bool = False):
     """Print een rode foutmelding naar de console en verwijs naar het logbestand."""
     print(f"\033[91mFOUT: {message}\033[0m", file=sys.stderr)
-    print(f"\033[93mZie het debug logbestand voor details: {DEBUG_LOG_PATH}\033[0m", file=sys.stderr)
+    print(f"\033[93mZie het debug-logbestand voor details: {DEBUG_LOG_PATH}\033[0m", file=sys.stderr)
     if show_examples:
         print(
-            f"\033[93m> Voorbeeld branchnaam: {EXAMPLE_BRANCH}\033[0m", file=sys.stderr
+            f"\033[93m> Voorbeeld branch-naam: {EXAMPLE_BRANCH}\033[0m", file=sys.stderr
         )
         print(
             f"\033[93m> Voorbeeld commit message: {EXAMPLE_COMMIT}\033[0m",

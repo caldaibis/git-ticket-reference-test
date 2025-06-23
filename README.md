@@ -14,10 +14,6 @@ Voor de allersnelste installatie in een nieuw of bestaand project, voer je het v
 curl -sSL https://raw.githubusercontent.com/caldaibis/git-ticket-reference-test/main/init.sh | bash
 ```
 
-https://raw.githubusercontent.com/caldaibis/git-ticket-reference-test/refs/heads/main/init.sh?token=GHSAT0AAAAAADGD4ULYQKZEWAGOBKBLO5EW2CZHEIQ
-
-(Vervang de URL met de raw link naar jouw `init.sh` bestand)
-
 Dit script doet het volgende voor je:
 
    - Controleert of `pre-commit` geïnstalleerd is.
@@ -45,7 +41,7 @@ Voeg de volgende regels toe aan je `.pre-commit-config.yaml` bestand:
 
 repos:
 -   repo: https://github.com/caldaibis/git-ticket-reference-test.git
-    rev: v1.0.0  # Gebruik de laatste versie-tag!
+    rev: v1.1.3  # Gebruik de laatste versie-tag!
     hooks:
     -   id: prepare-commit-msg-ticket
     -   id: validate-commit-msg-ticket

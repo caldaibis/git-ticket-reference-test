@@ -1,8 +1,6 @@
-# Dit bestand definieert de hooks die deze repository aanbiedt.
-
 -   id: prepare-commit-msg-ticket
     name: 'Prepare commit message with ticket ID'
-    description: 'Automatically adds a ticket ID (from branch name) to the commit message.'
+    description: 'Voegt automatisch een ticket-ID (uit de branch-naam) toe aan het commit-bericht.'
     entry: prepare-commit-msg-ticket
     language: python
     stages: [prepare-commit-msg]
@@ -11,7 +9,7 @@
 
 -   id: validate-commit-msg-ticket
     name: 'Validate commit message for ticket ID'
-    description: 'Validates that the commit message contains a valid ticket reference.'
+    description: 'Valideert dat het commit-bericht een geldige ticketreferentie bevat.'
     entry: validate-commit-msg-ticket
     language: python
     stages: [commit-msg]
