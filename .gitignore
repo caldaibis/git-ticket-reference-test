@@ -53,9 +53,6 @@ coverage.xml
 .env
 .env.*
 
-# Pre-commit
-.pre-commit-*
-
 # Log files
 *.log
 *.log.*
