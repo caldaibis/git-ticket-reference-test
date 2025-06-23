@@ -1,15 +1,16 @@
+# .pre-commit-config.yaml
+
 repos:
-  - repo: local
+-   repo: local
     hooks:
-      - id: prepare-commit-msg-ticket
-        name: Prepare commit message with ticket reference
-        entry: pdm run scripts/prepare_commit_msg.py
+    -   id: prepare-commit-msg-ticket
+        name: 'Prepare commit message with ticket ID'
+        entry: pdm run python scripts/prepare_commit_message.py
         language: system
         stages: [prepare-commit-msg]
-        pass_filenames: true
-      - id: commit-msg-ticket-validate
-        name: Validate commit message for ticket reference
-        entry: pdm run scripts/commit_msg_validate.py
+        
+    -   id: validate-commit-msg-ticket
+        name: 'Validate commit message for ticket ID'
+        entry: pdm run python scripts/validate_commit_message.py
         language: system
         stages: [commit-msg]
-        pass_filenames: true 

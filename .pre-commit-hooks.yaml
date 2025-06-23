@@ -3,15 +3,13 @@
 -   id: prepare-commit-msg-ticket
     name: 'Prepare commit message with ticket ID'
     description: 'Automatically adds a ticket ID (from branch name) to the commit message.'
-    entry: python scripts/prepare_commit_message.py
-    language: python
+    entry: pdm run python scripts/prepare_commit_message.py
+    language: system
     stages: [prepare-commit-msg]
-    additional_dependencies: [python-dotenv]
 
 -   id: validate-commit-msg-ticket
     name: 'Validate commit message for ticket ID'
     description: 'Validates that the commit message contains a valid ticket reference.'
-    entry: python scripts/validate_commit_message.py
-    language: python
+    entry: pdm run python scripts/validate_commit_message.py
+    language: system
     stages: [commit-msg]
-    additional_dependencies: [python-dotenv, requests]
