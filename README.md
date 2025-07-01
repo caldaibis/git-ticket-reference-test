@@ -4,7 +4,11 @@ Deze repository biedt een set van `pre-commit` hooks om automatisch ticketrefere
 
 ## Installatie & Gebruik
 
-Kies de methode die het beste bij je past: de snelle 'one-liner' of de handmatige installatie.
+1. Installeer `pre-commit`
+
+Indien je dit nog niet hebt: `pip install pre-commit` of `pipx install pre-commit` of `uv tool install pre-commit`
+
+2. Kies de methode die het beste bij je past: de snelle 'one-liner' of de handmatige installatie.
 
 ### 🚀 Quick Start (Aanbevolen voor macOS/Linux)
 
@@ -28,11 +32,7 @@ Je enige taak hierna is het invullen van het `.env` bestand.
 
 Voor volledige controle of voor Windows-gebruikers die geen `bash` gebruiken.
 
-1. Installeer `pre-commit`
-
-Indien je dit nog niet hebt: `pip install pre-commit` of `pipx install pre-commit` of `uv tool install pre-commit`
-
-2. Configureer `.pre-commit-config.yaml`
+1. Configureer `.pre-commit-config.yaml`
 
 Voeg de volgende regels toe aan je `.pre-commit-config.yaml` bestand:
 
@@ -47,13 +47,13 @@ repos:
     -   id: validate-commit-msg-ticket
 ```
 
-3. Activeer de Hooks
+2. Activeer de Hooks
 
 ```bash
 pre-commit install --hook-type prepare-commit-msg --hook-type commit-msg
 ```
 
-4. Configureer API-validatie
+3. Configureer API-validatie
 
 Maak handmatig een `.env` bestand aan (zie `.env.example` in deze repo voor een voorbeeld) en voeg `.env` toe aan je `.gitignore`.
 
