@@ -1,8 +1,5 @@
--   id: prepare-commit-msg-ticket
-    name: 'Prepare commit message with ticket ID'
-    description: 'Voegt automatisch een ticket-ID (uit de branch-naam) toe aan het commit-bericht.'
-    entry: prepare-commit-msg-ticket
-    language: python
-    stages: [prepare-commit-msg]
-    additional_dependencies: [python-dotenv]
-    verbose: true
+- id: prepare-commit-msg-ticket
+  name: Add ticket ID to commit
+  entry: prepare-commit-msg-ticket
+  language: python
+  stages: [prepare-commit-msg]

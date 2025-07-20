@@ -7,7 +7,6 @@
 
 # --- Configuratie ---
 REPO_URL="https://github.com/caldaibis/git-ticket-reference-test.git"
-ENV_EXAMPLE_RAW_URL="https://raw.githubusercontent.com/caldaibis/git-ticket-reference-test/main/.env.example"
 # --- Einde Configuratie ---
 
 # Kleurcodes voor output
@@ -20,7 +19,7 @@ echo -e "${GREEN}--- Setup voor Automatische Ticket Referenties ---${NC}"
 # 1. Controleer of pre-commit geïnstalleerd is
 if ! command -v pre-commit &> /dev/null; then
     echo -e "${YELLOW}FOUT: 'pre-commit' is niet geïnstalleerd.${NC}"
-    echo "Installeer het eerst via: pip install pre-commit"
+    echo "Installeer het eerst via: \`pip(x) install pre-commit\` of \`uv tool install pre-commit\`"
     exit 1
 fi
 
@@ -59,31 +58,9 @@ else
     fi
 fi
 
-# 4. Maak .env bestand aan van voorbeeld, indien het nog niet bestaat
-ENV_FILE=".env"
-if [ ! -f "$ENV_FILE" ]; then
-    echo "Downloaden van configuratievoorbeeld naar ${ENV_FILE}..."
-    curl -s -o "$ENV_FILE" "$ENV_EXAMPLE_RAW_URL"
-else
-    echo "Bestand '${ENV_FILE}' bestaat al. Overslaan."
-fi
-
-# 5. Voeg .env toe aan .gitignore, indien nog niet aanwezig
-GITIGNORE_FILE=".gitignore"
-if ! grep -q "^\.env$" "$GITIGNORE_FILE" 2>/dev/null; then
-    echo "Toevoegen van .env aan ${GITIGNORE_FILE}..."
-    echo -e "\n# Lokale omgevingsvariabelen voor Git hooks\n.env" >> "$GITIGNORE_FILE"
-fi
-
-# 6. Installeer de Git hook
+# 5. Installeer de Git hook
 echo "Installeren van de Git hook..."
 pre-commit install --hook-type prepare-commit-msg
 
 # --- SUCCESMELDING ---
 echo -e "\n${GREEN}✔ Setup voltooid! De hook is nu actief.${NC}"
-echo "-------------------------------------------------------------------"
-echo -e "${YELLOW}** OPTIONEEL: Configureer aangepaste ticket-ID patronen **${NC}"
-echo "Om aangepaste ticket-ID patronen te gebruiken, kun je het aangemaakte"
-echo "'.env' bestand aanpassen. Zonder configuratie worden standaard"
-echo "patronen gebruikt voor het herkennen van ticket-ID's."
-echo "-------------------------------------------------------------------"
