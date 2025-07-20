@@ -2,7 +2,7 @@
 
 # ==============================================================================
 #  Setup Script voor Automatische Git Ticket Referenties
-#  Dit script configureert de pre-commit hooks in een doelrepository.
+#  Dit script configureert de pre-commit hook in een doelrepository.
 # ==============================================================================
 
 # --- Configuratie ---
@@ -41,7 +41,6 @@ HOOK_BLOCK=$(cat <<EOF
     rev: $LATEST_TAG
     hooks:
     -   id: prepare-commit-msg-ticket
-    -   id: validate-commit-msg-ticket
 EOF
 )
 
@@ -76,15 +75,15 @@ if ! grep -q "^\.env$" "$GITIGNORE_FILE" 2>/dev/null; then
     echo -e "\n# Lokale omgevingsvariabelen voor Git hooks\n.env" >> "$GITIGNORE_FILE"
 fi
 
-# 6. Installeer de Git hooks
-echo "Installeren van de Git hooks..."
-pre-commit install --hook-type prepare-commit-msg --hook-type commit-msg
+# 6. Installeer de Git hook
+echo "Installeren van de Git hook..."
+pre-commit install --hook-type prepare-commit-msg
 
 # --- SUCCESMELDING ---
-echo -e "\n${GREEN}✔ Setup voltooid! De hooks zijn nu actief.${NC}"
+echo -e "\n${GREEN}✔ Setup voltooid! De hook is nu actief.${NC}"
 echo "-------------------------------------------------------------------"
-echo -e "${YELLOW}** ACTIE VEREIST: Configureer API-validatie **${NC}"
-echo "Om te controleren of tickets echt bestaan, moet je het aangemaakte"
-echo -e "'.env' bestand invullen met de juiste waarden voor jouw platform."
-echo "Zonder deze configuratie wordt het bestaan van tickets NIET gevalideerd."
+echo -e "${YELLOW}** OPTIONEEL: Configureer aangepaste ticket-ID patronen **${NC}"
+echo "Om aangepaste ticket-ID patronen te gebruiken, kun je het aangemaakte"
+echo "'.env' bestand aanpassen. Zonder configuratie worden standaard"
+echo "patronen gebruikt voor het herkennen van ticket-ID's."
 echo "-------------------------------------------------------------------"

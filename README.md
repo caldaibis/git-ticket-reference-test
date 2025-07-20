@@ -1,6 +1,6 @@
 # Automatisering van Git Ticket Referenties
 
-Deze repository biedt een set van `pre-commit` hooks om automatisch ticketreferenties (GitLab, GitHub, Azure DevOps) toe te voegen en te valideren in je Git commit-berichten.
+Deze repository biedt een `pre-commit` hook om automatisch ticketreferenties toe te voegen aan je Git commit-berichten op basis van je branch-naam.
 
 ## Installatie & Gebruik
 
@@ -21,12 +21,12 @@ curl -sSL https://raw.githubusercontent.com/caldaibis/git-ticket-reference-test/
 Dit script doet het volgende voor je:
 
    - Controleert of `pre-commit` geïnstalleerd is.
-   - Voegt de laatste versie van de hooks toe aan `.pre-commit-config.yaml`.
+   - Voegt de hook toe aan `.pre-commit-config.yaml`.
    - Maakt een `.env` bestand aan op basis van het voorbeeld.
    - Voegt `.env` toe aan je .gitignore.
-   - Activeert de hooks in Git.
+   - Activeert de hook in Git.
 
-Je enige taak hierna is het invullen van het `.env` bestand.
+Je enige taak hierna is het aanpassen van het `.env` bestand indien je aangepaste ticket-ID patronen wilt gebruiken.
 
 ### ✋ Handmatige Installatie
 
@@ -44,22 +44,21 @@ repos:
     rev: v1.15.0  # Gebruik de laatste versie-tag (of doe `pre-commit autoupdate` in je CLI)
     hooks:
     -   id: prepare-commit-msg-ticket
-    -   id: validate-commit-msg-ticket
 ```
 
-2. Activeer de Hooks
+2. Activeer de Hook
 
 ```bash
-pre-commit install --hook-type prepare-commit-msg --hook-type commit-msg
+pre-commit install --hook-type prepare-commit-msg
 ```
 
-3. Configureer API-validatie
+3. Configureer ticket-ID herkenning (optioneel)
 
 Maak handmatig een `.env` bestand aan (zie `.env.example` in deze repo voor een voorbeeld) en voeg `.env` toe aan je `.gitignore`.
 
 ## Updaten naar de nieuwste versie
 
-Om de hooks bij te werken naar de laatste versie, voer je het volgende commando uit:
+Om de hook bij te werken naar de laatste versie, voer je het volgende commando uit:
 
 ```bash
 pre-commit autoupdate
@@ -72,4 +71,3 @@ Dit commando controleert de Git-repository's in je `.pre-commit-config.yaml` en 
 Na installatie zal bij elke git commit:
 
    - `prepare-commit-message`: de ticket-ID uit je branch-naam lezen en automatisch vooraan je commit-bericht plaatsen.
-   - `commit-message`: valideren of je commit-bericht een geldige ticket-ID bevat en (indien geconfigureerd) of dit ticket daadwerkelijk bestaat op je gekozen platform.
