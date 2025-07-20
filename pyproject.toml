@@ -1,6 +1,6 @@
 [project]
 name = "git-ticket-reference-test"
-version = "1.21.2"
+version = "1.21.3"
 description = "Pre-commit hook om automatisch ticketreferenties toe te voegen aan Git commit-berichten."
 authors = [
     {name = "Collin Aldaibis", email = "caldabis@gmail.com"},
