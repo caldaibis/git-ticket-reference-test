@@ -31,7 +31,7 @@ if [ -z "$LATEST_TAG" ]; then
     echo -e "${YELLOW}FOUT: Kon geen versie-tag vinden in de remote repository.${NC}"
     exit 1
 fi
-echo "Gevonden versie: ${GREEN}$LATEST_TAG${NC}"
+echo -e "Gevonden versie: ${GREEN}$LATEST_TAG${NC}"
 
 # 3. Configureer .pre-commit-config.yaml
 CONFIG_FILE=".pre-commit-config.yaml"
